@@ -19,7 +19,7 @@ app.get('/*', (req, res) => res.sendFile(path.join(__dirname, '../index.html')))
 
 // Error handler
 app.use((err, req, res, next) => {
-  console.error(chalk.red(err))
+  if (err.message) console.error(chalk.red(`Error: ${err.message}`))
   if (err.stack) console.error(chalk.red(err.stack))
   res.status(err.status || 500).send(err.message || 'Internal server error.')
 });

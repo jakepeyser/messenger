@@ -11,4 +11,6 @@ deploy:
   skip_cleanup: true
   provider: heroku
   app:
-    master: messenger
+    master: text-messenger
+  api_key:
+    secure: a7kGXDntf/fE0zPRDC2FOHLhTDLIvR8GRw0YvLkYW5NYEOUiboqsFAu5/+X52Or09zufKbjix6ZCDengZpqHJmEixD7R4LjTQqBUK7UjST5QPpH5lVjWCjWhZxhAWtjiHvl0oITeh++GAVMcrBpY9V5LVNgsLPIvHEpf6Zr3/sSq4IBAvqjBY/n/h3d0Xvu1pnDttFYUUammmOBnPFs+k4UV6M5lDOYB6v1whlE/OAUT3smbYKgNElYFYHPzYX5rsWR5X0NB6pgLND5cx544lNDbopLSYrkHwT5OcMEnlw0MraDbdTgVgGiZlx90ZN1VgJs/2G5J8mqxU1L5ONAq4tdUahldawiiqY8McEiWWhKZ8W5+dVTAsu9LYfCFYo25Biol6ofHLUQtESVcq/IId8dYIra61ACboaPknIB/tNG2p1eVmRG0RgmXYpLJkW/SVtKCDZZhp29CO0jBcNjmMYgaz/HT9z19cXGQ39gnacy/0tpmpXEtb1S7GQ3OpGlNH0Okx2hEuF+4+PjKW8rFnIeQiWnZz5Q/v/7Upi3Q0EbkKi/uorMyZNL2NpEqe1KT2cyD2Z4vM/sg55UWqjfXPPte6dwEZMOuxBaFBRz2anW/2hvMV8gxBEVvciR7mCBf01MW0jW7YPTR/wZrq5DSFoZ0vi94U1+9XEh00oHJS4Q=

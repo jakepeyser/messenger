@@ -10,11 +10,12 @@ const client = new twilio.RestClient(process.env.TWILIO_ACCOUNT_SID, process.env
 const fs = require('fs')
 const path = require('path')
 const parse = require('csv-parse')
-const csvFile = path.join(__dirname, `../numbers/${process.env.PHONE_NUMBERS_FILE}.csv`)
-const batchSize = parseInt(process.env.MESSAGE_BATCH)
+const csvFile = path.join(__dirname, `../numbers/${process.env.PHONE_NUMBERS_FILE || 'users'}.csv`)
+const batchSize = parseInt(process.env.MESSAGE_BATCH) || 250
+console.log(batchSize)
 let currentNumInd = 0
 let peeps // This will be the parsed list of users in the CSV
-const fields = {} // This will hold the relevant fields and their corresponding index in each CSV object
+let fields = {} // This will hold the relevant fields and their corresponding index in each CSV object
 
 // Read in the CSV file
 fs.readFile(csvFile, (err, buf) => {
@@ -27,12 +28,8 @@ fs.readFile(csvFile, (err, buf) => {
       if (parseErr) {
         console.error('Error parsing CSV', parseErr)
       } else {
-        // Extract the relevant fields and populate the list of users
-        // TODO: Extract fields more efficiently
-        fields.firstName = output[0].findIndex(col => col === 'firstName')
-        fields.lastName = output[0].findIndex(col => col === 'lastName')
-        fields.email = output[0].findIndex(col => col === 'email')
-        fields.phoneNumber = output[0].findIndex(col => col === 'phoneNumber')
+        // Extract the CSV fields' columns and populate the list of users
+        output[0].forEach((col, ind) => fields[col] = ind)
         peeps = output.slice(1)
       }
     });
@@ -86,22 +83,14 @@ router.post('/', (req, res, next) => {
     console.log(`Sending new batch of messages with: ${req.body.text}`)
     Promise.all(messages)
       .then(responses => {
-        // Extract responses from each message attempt
+        // Extract responses for each message attempt
         const messageResults = responses.map(response => {
-          let success, message
-          if (response.error) {
-            success = false
-            message = response.message
-          } else {
-            success = true
-            message = 'Message sent'
-          }
-          // TODO: Consolidate setting these vars ^^^
           return {
             name: response.name,
             email: response.email,
             number: response.number,
-            success, message
+            success: !response.error,
+            message: response.message || 'Message sent'
           }
         })
 
@@ -116,14 +105,14 @@ router.post('/', (req, res, next) => {
         currentNumInd = done ? 0 : endNumInd
       })
       .catch(err => {
-        console.error('Error occured while sending messages')
-        // TODO: Propagate to error handler instead
-        res.sendStatus(500)
+        next({ message: 'Issue sending messages thru Twilio' })
       })
   } else {
     // PIN sent with request was incorrect
-    // TODO: Propagate to error handler instead
-    res.status(401).send('Invalid PIN')
+    next({
+      status: 401,
+      message: 'Invalid PIN'
+    })
   }
 })
 
