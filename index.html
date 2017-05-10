@@ -2,23 +2,35 @@
 <html>
 <head>
   <title>🔥 messenger 🔥</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="Content-type" content="text/html; charset=utf-8">
-  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,700">
   <link rel="stylesheet" href="//cdn.rawgit.com/necolas/normalize.css/master/normalize.css">
   <link rel="stylesheet" href="//cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css">
   <script src="https://unpkg.com/vue/dist/vue.js"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <style>
+    h1 {
+      margin-top: 2rem;
+    }
     .error {
       display: block;
       margin-bottom: 20px;
       color: #EB2334;
     }
-    .message-counter {
+    .message-status {
       font-size: 18px;
     }
+    button:focus {
+      background-color: #9b4dca;
+      border-color: #9b4dca;
+    }
+    button:hover {
+      background-color: #606c76;
+      border-color: #606c76;
+    }
     h3 {
-      margin: 2rem 0 1rem
+      margin: 2rem 0 1rem;
     }
     .check.success {
       color: #02F883;
@@ -30,7 +42,7 @@
     .done {
       font-size: 24px;
       font-weight: bold;
-      color: #FF7E00;
+      color: #9b4dca;
     }
     form, textarea, input {
       margin-bottom: 1em
@@ -38,6 +50,17 @@
     em {
       font-weight: bold;
       font-size: 22px;
+    }
+    @media screen and (max-width: 600px) {
+      h1 {
+        font-size: 3rem;
+      }
+      .done {
+        font-size: 20px;
+      }
+      th.desktop, td.desktop {
+        display: none;
+      }
     }
   </style>
 </head>
@@ -57,23 +80,25 @@
           <button :disabled="done">Send</button>
         </fieldset>
       </form>
-      <span class="message-counter">{{ done ? 'Total messages sent' : 'Messages sent so far'}}: <em>{{ messagesSent }}</em></span>
+      <span v-if="sending" class="message-status">Sending 📱...</span>
+      <span v-else class="message-status">{{ done ? 'Total messages sent' : 'Messages sent so far'}}: <em>{{ messagesSent }}</em></span>
       <h3>Results</h3>
-      <span v-if="sending">Sending... 🗣🗣🗣</span>
-      <span v-else-if="done" class="done">All messages have been sent 📱📱📱</span>
+      <span v-if="done" class="done">All messages have been sent!</span>
       <table style="width:100%">
         <tr>
           <th>Name</th>
           <th>Phone Number</th>
+          <th class="desktop">Email</th>
           <th>Success</th>
-          <th>Message</th>
+          <th class="desktop">Message</th>
         </tr>
         <span></span>
         <tr v-for="result in results">
           <td>{{ result.name }}</td>
-          <td>{{ result.number }}</td> 
+          <td>{{ result.number }}</td>
+          <td class="desktop">{{ result.email }}</td>
           <td :class="{ check: true, success: result.success }">{{ result.success ? 'Yes' : 'No' }}</td>
-          <td>{{ result.message }}</td>
+          <td class="desktop">{{ result.message }}</td>
         </tr>
       </table>
     </div>
@@ -83,7 +108,7 @@
     new Vue({
       el: '#app',
       data: {
-        greeting: 'Welcome to 🔥 Messenger 🔥',
+        greeting: 'Welcome to Messenger 🔥',
         message: '',
         pin: '',
         messageError: false,
