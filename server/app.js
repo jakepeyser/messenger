@@ -12,6 +12,10 @@ if (process.env.NODE_ENV !== 'production') {
 // React to an unsecure request over http
 if (process.env.NODE_ENV === 'production') {
   app.use('*', function(req, res, next) {
+    console.log('secure:', req.secure)
+    console.log('headers:', req.headers)
+    console.log('url:', req.url)
+    console.log(req)
     // Continue if SSL
     if (req.secure)
       next()
