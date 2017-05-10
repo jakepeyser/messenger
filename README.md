@@ -36,11 +36,11 @@ PIN=<YOUR_MESSENGER_PIN>
 ```
 
 - **`TWILIO_ACCOUNT_SID`**: An application SID is the way that a Twilio application is identified. 
-- **`TWILIO_AUTH_TOKEN`**: Acts as the password for your twilio application.
+- **`TWILIO_AUTH_TOKEN`**: Acts as the password for your Twilio application.
 - **`TWILIO_NUMBER`**: The Twilio number from which you would like to send the SMS messages.
-- **`PHONE_NUMBERS_FILE`** ***(optional)***: The CSV file where users will be parsed from when the server starts. For instance, if this value was set to `prod`, the server will look for users inside the file `server/numbers/prod.csv`.
-- **`MESSAGE_BATCH`**: Sometimes when we have a large number of users, we want to batch the messages into several payloads so that we can monitor any issues. This is one way to mitigate the [message queues](https://support.twilio.com/hc/en-us/articles/115002943027-Understanding-Twilio-Rate-Limits-and-Message-Queues) that are a downstream bottleneck of sending SMS messages. This value defaults to 250, but using this variable we can set it to any number we would like.
-- **`PIN`**: As an extra level of security, we require a PIN for any incoming `POST /messages` request. As the app may be made available through a public endpoint, this ensures that anyone who comes across the URL cannot send messages to your users.
+- **`PHONE_NUMBERS_FILE`** **(optional)**: The CSV file where users will be parsed from when the server starts. For instance, if this value was set to `prod` the server will look for users inside the file `server/numbers/prod.csv`.
+- **`MESSAGE_BATCH`** **(optional)**: Sometimes when we have a large number of users, we want to batch the messages into several payloads so that we can monitor any potential issues as they are sent. This is one way to mitigate the [message queues](https://support.twilio.com/hc/en-us/articles/115002943027-Understanding-Twilio-Rate-Limits-and-Message-Queues) that act as a downstream bottleneck when sending SMS messages. This value defaults to 250, but using this variable we can set it to any number we would like.
+- **`PIN`**: As an extra level of security, we require a PIN for any incoming `POST /messages` request. As the app may be made available through a public endpoint, this ensures that anyone who comes across the URL cannot send messages to your users without the knowledge of this PIN.
 
 ## Running Locally
 
