@@ -12,7 +12,6 @@ const path = require('path')
 const parse = require('csv-parse')
 const csvFile = path.join(__dirname, `../numbers/${process.env.PHONE_NUMBERS_FILE || 'users'}.csv`)
 const batchSize = parseInt(process.env.MESSAGE_BATCH) || 250
-console.log(batchSize)
 let currentNumInd = 0
 let peeps // This will be the parsed list of users in the CSV
 let fields = {} // This will hold the relevant fields and their corresponding index in each CSV object

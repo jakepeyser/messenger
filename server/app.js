@@ -9,6 +9,25 @@ if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config()
 }
 
+// React to an unsecure request over http
+if (process.env.NODE_ENV === 'production') {
+  app.use('*', function(req, res, next) {
+    // Continue if SSL
+    if (req.secure)
+      next()
+    // Redirect GET requests to https
+    else if (req.method === 'GET')
+      res.redirect(`https://${req.headers.host}${req.url}`)
+    // Return error to users for all other requests
+    else {
+      next({
+        status: 403,
+        message: 'SSL required'
+      })
+    }
+  })
+}
+
 // Logging, static, and body-parser middleware
 app.use(morgan('dev'))
 app.use(bodyParser.json()) // would be for AJAX requests
