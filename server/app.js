@@ -30,11 +30,12 @@ if (process.env.NODE_ENV === 'production') {
 
 // Logging, static, and body-parser middleware
 app.use(morgan('dev'))
-app.use(bodyParser.json()) // would be for AJAX requests
+app.use(express.static(path.join(__dirname, '../app')))
+app.use(bodyParser.json())
 
 // Handle API and all browser requests
 app.use('/api', require('./routes'))
-app.get('/*', (req, res) => res.sendFile(path.join(__dirname, '../index.html')))
+app.get('/*', (req, res) => res.sendFile(path.join(__dirname, '../app/index.html')))
 
 // Error handler
 app.use((err, req, res, next) => {

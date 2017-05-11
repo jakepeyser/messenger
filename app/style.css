@@ -1,0 +1,68 @@
+.container {
+  max-width: 140rem
+}
+h1 {
+  margin-top: 2rem;
+}
+.error {
+  display: block;
+  margin-bottom: 20px;
+  color: #EB2334;
+}
+.message-status {
+  font-size: 18px;
+}
+button:focus {
+  background-color: #9b4dca;
+  border-color: #9b4dca;
+}
+button:hover {
+  background-color: #606c76;
+  border-color: #606c76;
+}
+h3 {
+  margin: 2rem 0 1rem;
+}
+th.mobile, td.mobile {
+  display: none;
+}
+.check.success {
+  color: #02F883;
+}
+.check:not(.success) {
+  color: #EB2334;
+  font-weight: bold;
+}
+.done {
+  font-size: 24px;
+  font-weight: bold;
+  color: #9b4dca;
+}
+form, textarea, input {
+  margin-bottom: 1em
+}
+em {
+  font-weight: bold;
+  font-size: 22px;
+}
+@media screen and (max-width: 600px) {
+  th.mobile, td.mobile {
+    display: table-cell;
+  }
+}
+@media screen and (max-width: 600px) {
+  h1 {
+    font-size: 3rem;
+  }
+  .done {
+    font-size: 20px;
+  }
+  th.tablet, td.tablet {
+    display: none;
+  }
+}
+@media screen and (max-width: 1200px) {
+  th.desktop, td.desktop {
+    display: none;
+  }
+}

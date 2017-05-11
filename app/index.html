@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>🔥 messenger 🔥</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,700">
+  <link rel="stylesheet" href="//cdn.rawgit.com/necolas/normalize.css/master/normalize.css">
+  <link rel="stylesheet" href="//cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://unpkg.com/vue/dist/vue.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="https://unpkg.com/moment/min/moment.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <div class="container">
+      <h1>{{ greeting }}</h1>
+      <form id="send-message" v-on:submit.prevent="sendMessage">
+        <fieldset>
+          <label for="message">Message</label>
+          <textarea id="message" v-if="!inProgress" v-model="message" placeholder="Enter your message to be sent via SMS"></textarea>
+          <p v-else>{{ message }}</p>
+          <span v-if="messageError" class="error">Message must not be empty</span>
+          <label for="pin" v-if="!inProgress">PIN</label>
+          <input type="password" id="pin" v-if="!inProgress" v-model="pin">
+          <span v-if="pinError" class="error">PIN is incorrect</span>
+          <button :disabled="done">Send</button>
+        </fieldset>
+      </form>
+      <span v-if="sending" class="message-status">Sending 📱...</span>
+      <span v-else class="message-status">{{ done ? 'Total messages sent' : 'Messages sent so far'}}: <em>{{ messagesSent }}</em></span>
+      <h3>Results</h3>
+      <span v-if="done" class="done">All messages have been sent!</span>
+      <table style="width:100%">
+        <tr>
+          <th>Date</th>
+          <th>Name</th>
+          <th>Phone Number</th>
+          <th class="tablet">Email</th>
+          <th>Text</th>
+          <th>Success</th>
+          <th class="desktop">Message</th>
+        </tr>
+        <span></span>
+        <tr v-for="result in results">
+          <td class="tablet">{{ formatDate(result.date) }}</td>
+          <td class="mobile">{{ formatDate(result.date, true) }}</td>
+          <td>{{ result.name }}</td>
+          <td>{{ result.number }}</td>
+          <td class="tablet">{{ result.email }}</td>
+          <td>"{{ result.text }}"</td>
+          <td :class="{ check: true, success: result.success }">{{ result.success ? 'Yes' : 'No' }}</td>
+          <td class="desktop">{{ result.message }}</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+  <script type="text/javascript" src="index.js"></script>
+</body>
+</html>
