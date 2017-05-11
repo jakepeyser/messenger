@@ -9,7 +9,11 @@
   <link rel="stylesheet" href="//cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css">
   <script src="https://unpkg.com/vue/dist/vue.js"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="https://unpkg.com/moment/min/moment.min.js"></script>
   <style>
+    .container {
+      max-width: 140rem
+    }
     h1 {
       margin-top: 2rem;
     }
@@ -32,6 +36,9 @@
     h3 {
       margin: 2rem 0 1rem;
     }
+    th.mobile, td.mobile {
+      display: none;
+    }
     .check.success {
       color: #02F883;
     }
@@ -52,12 +59,22 @@
       font-size: 22px;
     }
     @media screen and (max-width: 600px) {
+      th.mobile, td.mobile {
+        display: table-cell;
+      }
+    }
+    @media screen and (max-width: 600px) {
       h1 {
         font-size: 3rem;
       }
       .done {
         font-size: 20px;
       }
+      th.tablet, td.tablet {
+        display: none;
+      }
+    }
+    @media screen and (max-width: 1200px) {
       th.desktop, td.desktop {
         display: none;
       }
@@ -86,17 +103,22 @@
       <span v-if="done" class="done">All messages have been sent!</span>
       <table style="width:100%">
         <tr>
+          <th>Date</th>
           <th>Name</th>
           <th>Phone Number</th>
-          <th class="desktop">Email</th>
+          <th class="tablet">Email</th>
+          <th>Text</th>
           <th>Success</th>
           <th class="desktop">Message</th>
         </tr>
         <span></span>
         <tr v-for="result in results">
+          <td class="tablet">{{ formatDate(result.date) }}</td>
+          <td class="mobile">{{ formatDate(result.date, true) }}</td>
           <td>{{ result.name }}</td>
           <td>{{ result.number }}</td>
-          <td class="desktop">{{ result.email }}</td>
+          <td class="tablet">{{ result.email }}</td>
+          <td>"{{ result.text }}"</td>
           <td :class="{ check: true, success: result.success }">{{ result.success ? 'Yes' : 'No' }}</td>
           <td class="desktop">{{ result.message }}</td>
         </tr>
@@ -121,9 +143,19 @@
       },
       mounted () {
         axios.get('/api/heartbeat')
-          .then(() => console.log('server is running..'))
+          .then(() => {
+            console.log('server is running..')
+            return axios.get('/api/messages')
+          })
+          .then(result => {
+            this.results = result.data
+          })
       },
       methods: {
+        formatDate (date, small) {
+          return moment(date).format(small ? 'MMM DD' : 'lll')
+        },
+
         sendMessage () {
           if (!this.message) {
             return this.messageError = true
@@ -138,7 +170,7 @@
             console.log(response)
             const responses = response.data.responses
             if (responses && responses.length > 0) {
-              this.results = [...this.results, ...responses]
+              this.results = [...responses, ...this.results]
             }
             this.messagesSent += response.data.numSent
             this.done = response.data.done

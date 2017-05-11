@@ -27,6 +27,12 @@ const Message = db.define('message', {
       notEmpty: true
     }
   },
+  text: {
+    type: Sequelize.STRING,
+    validate: {
+      notEmpty: true
+    }
+  },
   success: {
     type: Sequelize.BOOLEAN,
     validate: {

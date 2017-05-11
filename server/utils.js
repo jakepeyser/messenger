@@ -48,4 +48,15 @@ const sendMessage = (message, recipient) => {
   })
 }
 
-module.exports = { parseCSV, sendMessage }
+// Convert a Message DB object to a API message response object
+const messageTransform = message => ({
+  name: `${message.first_name} ${message.last_name}`,
+  email: message.email,
+  number: message.phone_number,
+  text: message.text,
+  success: message.success,
+  message: message.message,
+  date: message.sent_at
+})
+
+module.exports = { parseCSV, sendMessage, messageTransform }

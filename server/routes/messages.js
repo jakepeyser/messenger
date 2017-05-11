@@ -7,7 +7,7 @@ const db = require('../../db/')
 const Message  = db.model('message')
 
 // Vars used by API handlers
-const { parseCSV, sendMessage } = require('../utils')
+const { parseCSV, sendMessage, messageTransform } = require('../utils')
 let peeps, fields
 const userFields = [ 'firstName', 'lastName', 'email', 'phoneNumber' ]
 const batchSize = parseInt(process.env.MESSAGE_BATCH) || 250
@@ -21,6 +21,14 @@ parseCSV(csvFile, (err, cols, users) => {
     fields = cols
     peeps = users
   }
+})
+
+// Retrieve all the messages sent so far, in reverse chronological order
+router.get('/', (req, res, next) => {
+  Message.findAll({ order: [['sent_at', 'DESC']] })
+    .then(logs => logs.map(messageTransform))
+    .then(messages => res.send(messages))
+    .catch(next)
 })
 
 // Send the allotted text message to the next batch of users
@@ -55,24 +63,17 @@ router.post('/', (req, res, next) => {
             last_name: response.lastName,
             email: response.email,
             phone_number: response.phoneNumber,
+            text: req.body.text,
             success: !response.error,
             message: response.message
           })
         })
         return Promise.all(newMessages)
       })
-      .then(logs => logs.map(log => ({
-        name: `${log.first_name} ${log.last_name}`,
-	      email: log.email,
-        number: log.phone_number,
-        success: log.success,
-        message: log.message,
-        date: log.sent_at
-      })))
-      .then(results => {
+      .then(logs => {
         // Send responses
         res.status(201).send({
-          responses: results,
+          responses: logs.map(messageTransform),
           numSent: endNumInd - currentNumInd,
           done
         })
