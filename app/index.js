@@ -31,6 +31,14 @@ new Vue({
       return moment(date).format(small ? 'MMM DD' : 'lll')
     },
 
+    reset() {
+      this.message = ''
+      this.pin = ''
+      this.messagesSent = 0
+      this.done = false
+      this.inProgress = false
+    },
+
     sendMessage() {
       if (!this.message) {
         this.messageError = true

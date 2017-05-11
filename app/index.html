@@ -25,7 +25,15 @@
           <label for="pin" v-if="!inProgress">PIN</label>
           <input type="password" id="pin" v-if="!inProgress" v-model="pin">
           <span v-if="pinError" class="error">PIN is incorrect</span>
-          <button :disabled="done">Send</button>
+          <div class="send-message">
+            <button :disabled="done">Send</button>
+            <img
+              class="restart"
+              :style="{ display: done ? 'initial' : 'none' }"
+              src="https://cdn1.iconfinder.com/data/icons/material-core/16/refresh-32.png"
+              @click="reset"
+            >
+          </div>
         </fieldset>
       </form>
       <span v-if="sending" class="message-status">Sending 📱...</span>
