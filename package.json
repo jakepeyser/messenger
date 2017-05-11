@@ -26,6 +26,9 @@
     "csv-parse": "1.2.0",
     "express": "4.15.2",
     "morgan": "1.8.1",
+    "pg": "6.1.5",
+    "pg-native": "1.10.1",
+    "sequelize": "3.30.4",
     "twilio": "2.11.1"
   },
   "devDependencies": {

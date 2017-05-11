@@ -2,64 +2,26 @@
 const express = require('express')
 const router = express()
 
-// Setup Twilio
-const twilio = require('twilio')
-const client = new twilio.RestClient(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN)
+// Get Message model
+const db = require('../../db/')
+const Message  = db.model('message')
 
-// Phone number CSV parsing vars
-const fs = require('fs')
-const path = require('path')
-const parse = require('csv-parse')
-const csvFile = path.join(__dirname, `../numbers/${process.env.PHONE_NUMBERS_FILE || 'users'}.csv`)
+// Vars used by API handlers
+const { parseCSV, sendMessage } = require('../utils')
+let peeps, fields
+const userFields = [ 'firstName', 'lastName', 'email', 'phoneNumber' ]
 const batchSize = parseInt(process.env.MESSAGE_BATCH) || 250
 let currentNumInd = 0
-let peeps // This will be the parsed list of users in the CSV
-let fields = {} // This will hold the relevant fields and their corresponding index in each CSV object
 
-// Read in the CSV file
-fs.readFile(csvFile, (err, buf) => {
-  if (err) {
-    console.error('Error reading phone number CSV', err)
-  } else {
-    const recordsString = buf.toString()
-    // Parse the attendee CSV file
-    parse(recordsString, {}, (parseErr, output) => {
-      if (parseErr) {
-        console.error('Error parsing CSV', parseErr)
-      } else {
-        // Extract the CSV fields' columns and populate the list of users
-        output[0].forEach((col, ind) => fields[col] = ind)
-        peeps = output.slice(1)
-      }
-    });
+// Read in the users CSV file
+const path = require('path')
+const csvFile = path.join(__dirname, `../numbers/${process.env.PHONE_NUMBERS_FILE || 'users'}.csv`)
+parseCSV(csvFile, (err, cols, users) => {
+  if (!err) {
+    fields = cols
+    peeps = users
   }
-});
-
-// Create a promise that will send a text message when resolved
-const sendMessage = (message, person) => {
-  // Grab relevant info from the user whom is receiving the message
-  const personFields = {
-    name: `${person[fields.firstName]} ${person[fields.lastName]}`,
-    email: person[fields.email],
-    number: person[fields.phoneNumber]
-  }
-
-  // Create and return the promise
-  return new Promise((resolve, reject) => {
-    return client.messages.create({
-      body: message,
-      to: personFields.number,  // Text this number
-      from: `+1${process.env.TWILIO_NUMBER}` // Our Twilio number
-    }, (err, result) => {
-      if (err) {
-        console.error(`Failed to send message to ${personFields.number}`)
-        resolve(Object.assign({}, err, { error: true }, personFields))
-      } else {
-        resolve(Object.assign({}, result, { error: false }, personFields))
-      }
-    })
-  })
-}
+})
 
 // Send the allotted text message to the next batch of users
 router.post('/', (req, res, next) => {
@@ -76,26 +38,41 @@ router.post('/', (req, res, next) => {
     // Prepare messages for each number in the current batch
     const messages = peeps
       .slice(currentNumInd, endNumInd)
-      .map(user => sendMessage(req.body.text, user))
+      .map(user => {
+        let person = {}
+        userFields.forEach(col => person[col] = user[fields[col]])
+        return sendMessage(req.body.text, person)
+      })
 
     // Send the messages and collect responses
     console.log(`Sending new batch of messages with: ${req.body.text}`)
     Promise.all(messages)
       .then(responses => {
-        // Extract responses for each message attempt
-        const messageResults = responses.map(response => {
-          return {
-            name: response.name,
+        // Save message and corresponding response to the DB
+        const newMessages = responses.map(response => {
+          return Message.create({
+            first_name: response.firstName,
+            last_name: response.lastName,
             email: response.email,
-            number: response.number,
+            phone_number: response.phoneNumber,
             success: !response.error,
-            message: response.message || 'Message sent'
-          }
+            message: response.message
+          })
         })
-
+        return Promise.all(newMessages)
+      })
+      .then(logs => logs.map(log => ({
+        name: `${log.first_name} ${log.last_name}`,
+	      email: log.email,
+        number: log.phone_number,
+        success: log.success,
+        message: log.message,
+        date: log.sent_at
+      })))
+      .then(results => {
         // Send responses
         res.status(201).send({
-          responses: messageResults,
+          responses: results,
           numSent: endNumInd - currentNumInd,
           done
         })
@@ -104,7 +81,7 @@ router.post('/', (req, res, next) => {
         currentNumInd = done ? 0 : endNumInd
       })
       .catch(err => {
-        next({ message: 'Issue sending messages thru Twilio' })
+        next({ message: 'Issue sending/saving messages' })
       })
   } else {
     // PIN sent with request was incorrect
