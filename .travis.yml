@@ -4,9 +4,7 @@ node_js:
 cache:
   directories:
   - node_modules
-install: npm install
 script: echo 'Deploying messenger to Heroku'
-before_deploy: rm -rf node_modules
 deploy:
   skip_cleanup: true
   provider: heroku
