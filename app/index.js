@@ -28,7 +28,7 @@ new Vue({
 
   methods: {
     formatDate(date, small) {
-      return moment(date).format(small ? 'MMM DD' : 'lll')
+      return moment(date).format(small ? 'MMM Do' : 'lll')
     },
 
     reset() {
