@@ -13,8 +13,6 @@ const db = new Sequelize(url, {
   define: {
     freezeTableName: true   // don't go changing our table names, Sequelize
   },
-  native: true,
-  ssl: true,
   logging: false
 })
 
