@@ -55,6 +55,53 @@ th.mobile, td.mobile {
   font-weight: bold;
   color: #9b4dca;
 }
+.paginator {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2.5rem;
+}
+.paginator > * {
+  cursor: pointer;
+}
+.paginator > *:hover {
+  opacity: .6;
+}
+.paginator .arrow {
+  height: 18px;
+}
+.paginator .arrow.disabled {
+  cursor: initial;
+  opacity: .4;
+}
+.paginator .arrow:first-child {
+  margin-right: 15px;
+}
+.paginator .arrow:last-child {
+  margin-left: 15px;
+}
+.paginator > .page {
+  transition: all 50ms linear;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 2px;
+  font-size: 18px;
+  font-weight: bold;
+}
+.paginator > .page + .page {
+  margin-left: 5px;
+}
+.paginator > .page.active {
+  background: #9b4dca;
+  color: white;
+}
+.paginator > .page.active:hover {
+  opacity: initial
+}
 form, textarea, input {
   margin-bottom: 1em
 }

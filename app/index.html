@@ -30,8 +30,8 @@
             <button :disabled="done">Send</button>
             <img
               class="restart"
-              :style="{ display: done ? 'initial' : 'none' }"
-              src="https://cdn1.iconfinder.com/data/icons/material-core/16/refresh-32.png"
+              v-if="done"
+              src="images/refresh.png"
               @click="reset"
             >
           </div>
@@ -39,30 +39,51 @@
       </form>
       <span v-if="sending" class="message-status">Sending 📱...</span>
       <span v-else class="message-status">{{ done ? 'Total messages sent' : 'Messages sent so far'}}: <em>{{ messagesSent }}</em></span>
-      <h3>Results</h3>
-      <span v-if="done" class="done">All messages have been sent!</span>
-      <table style="width:100%">
-        <tr>
-          <th>Date</th>
-          <th>Name</th>
-          <th>Phone Number</th>
-          <th class="tablet">Email</th>
-          <th>Text</th>
-          <th>Success</th>
-          <th class="desktop">Message</th>
-        </tr>
-        <span></span>
-        <tr v-for="result in results">
-          <td class="tablet">{{ formatDate(result.date) }}</td>
-          <td class="mobile">{{ formatDate(result.date, true) }}</td>
-          <td>{{ result.name }}</td>
-          <td>{{ result.number }}</td>
-          <td class="tablet">{{ result.email }}</td>
-          <td>"{{ result.text }}"</td>
-          <td :class="{ check: true, success: result.success }">{{ result.success ? 'Yes' : 'No' }}</td>
-          <td class="desktop">{{ result.message }}</td>
-        </tr>
-      </table>
+      <div v-if="results.length">
+        <h3>Results</h3>
+        <span v-if="done" class="done">All messages have been sent!</span>
+        <table style="width:100%">
+          <tr>
+            <th>Date</th>
+            <th>Name</th>
+            <th>Phone Number</th>
+            <th class="tablet">Email</th>
+            <th>Text</th>
+            <th>Success</th>
+            <th class="desktop">Message</th>
+          </tr>
+          <span></span>
+          <tr v-for="result in results">
+            <td class="tablet">{{ formatDate(result.date) }}</td>
+            <td class="mobile">{{ formatDate(result.date, true) }}</td>
+            <td>{{ result.name }}</td>
+            <td>{{ result.number }}</td>
+            <td class="tablet">{{ result.email }}</td>
+            <td>"{{ result.text }}"</td>
+            <td :class="{ check: true, success: result.success }">{{ result.success ? 'Yes' : 'No' }}</td>
+            <td class="desktop">{{ result.message }}</td>
+          </tr>
+        </table>
+        <div class="paginator">
+          <img
+            :class="{ arrow: true, disabled: prevPageDisabled }"
+            src="images/left.png"
+            @click="rotatePage(!prevPageDisabled, false)"
+          >
+          <div
+            v-for="page in pages"
+            :class="{ page: true, active: page === curPage }"
+            @click="changePage(page)"
+          >
+            {{ page }}
+          </div>
+          <img
+            :class="{ arrow: true, disabled: nextPageDisabled }"
+            src="images/right.png"
+            @click="rotatePage(!nextPageDisabled, true)"
+          >
+        </div>
+      </div>
     </div>
   </div>
   <script type="text/javascript" src="index.js"></script>
