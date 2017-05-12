@@ -41,11 +41,13 @@ PIN=<YOUR_MESSENGER_PIN>
 - **`PHONE_NUMBERS_FILE`** **(optional)**: The CSV file where users will be parsed from when the server starts. For instance, if this value was set to `prod` the server will look for users inside the file `server/numbers/prod.csv`.
 - **`MESSAGE_BATCH`** **(optional)**: Sometimes when we have a large number of users, we want to batch the messages into several payloads so that we can monitor any potential issues as they are sent. This is one way to mitigate the [message queues](https://support.twilio.com/hc/en-us/articles/115002943027-Understanding-Twilio-Rate-Limits-and-Message-Queues) that act as a downstream bottleneck when sending SMS messages. This value defaults to 250, but using this variable we can set it to any number we would like.
 - **`PIN`**: As an extra level of security, we require a PIN for any incoming `POST /messages` request. As the app may be made available through a public endpoint, this ensures that anyone who comes across the URL cannot send messages to your users without the knowledge of this PIN.
+- **`DATABASE_URL`** **(optional)**: The URL of the PostgreSQL DB storing the list of previously sent messages. If not present, the URL `postgres://localhost:5432/messenger` will be used.
 
 ## Running Locally
 
 ### Prerequisites
 - [Node.js and npm](https://nodejs.org/en/)
+- [PostgreSQL](https://www.postgresql.org/download/)
 - [Twilio account and phone number](https://www.twilio.com/phone-numbers)
   - Make sure that the phone number has SMS capabilities
 
@@ -91,11 +93,46 @@ Check to make sure the app is running
 - **200** - Server is running smoothly
 - **500** - Something is wrong
 
+### `GET /messages`
+
+Get a list of previously sent messages
+
+**Query Params**
+
+- **page (integer)**: The page of results to return  
+- **per (integer)**: The number of results per page
+
+**Responses**
+
+- **200** - Page retrieved successfully
+
+	```json
+	  totalPages: 5,
+	  messages: [
+		{
+		  "name": "John Doe",
+		  "email": "john.doe@example.com",
+		  "number": "+1 (555) 555-5555",
+		  "success": true,
+		  "message": "Message sent"
+		},
+		{
+		  "name": "Jane Doe",
+		  "email": "jane.doe@example.com",
+		  "number": "+12345",
+		  "success": false,
+		  "message": "The 'To' number +12345 is not a valid phone number."
+		}
+	  ]
+	```
+
+- **500** - Error occurred while retrieving messages
+
 ### `POST /messages`
 
 Send a message to a batch of users
 
-**Params**
+**Request Body**
 
 ```json
 {

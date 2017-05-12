@@ -25,9 +25,21 @@ parseCSV(csvFile, (err, cols, users) => {
 
 // Retrieve all the messages sent so far, in reverse chronological order
 router.get('/', (req, res, next) => {
-  Message.findAll({ order: [['sent_at', 'DESC']] })
-    .then(logs => logs.map(messageTransform))
-    .then(messages => res.send(messages))
+  // Calculate the pagination params based on inputs, otherwise use defaults
+  const limit = Number(req.query.per) || 10
+  const offset = ((Number(req.query.page) || 1) - 1) * limit
+
+  // Look up page of messages and return that with total number of pages
+  Message.findAndCountAll({
+    offset, limit,
+    order: [['sent_at', 'DESC']]
+  })
+    .then(result => {
+      res.send({
+        totalPages: Math.ceil(result.count / limit),
+        messages: result.rows.map(messageTransform)
+      })
+    })
     .catch(next)
 })
 
